@@ -1,0 +1,16 @@
+{
+  "name": "nodejsprojects",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-dev": "SET NODE_DEV=development && node app.js",
+    "start": "SET NODE_ENV=production && node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,0 +1,111 @@
+footer,
+nav a:hover {
+    font-weight: 700
+}
+
+.jumbotron,
+.profile header,
+footer {
+    text-align: center
+}
+
+header,
+nav li {
+    display: inline
+}
+
+footer,
+nav {
+    background-color: #00a2c6
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    font-family: Quicksand, sans-serif;
+    margin: 0;
+    padding: 0
+}
+
+.card,
+footer,
+main {
+    padding: 20px
+}
+
+main {
+    overflow: auto
+}
+
+h2,
+h3 {
+    color: #00a2c6
+}
+
+footer {
+    color: #fff
+}
+
+.featured-image {
+    max-height: 300px;
+    object-fit: cover;
+    object-position: center;
+    width: 100%
+}
+
+.profile img {
+    width: 200px
+}
+
+.card {
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, .2);
+    margin-top: 20px
+}
+
+.jumbotron {
+    background-color: #00c8eb;
+    color: #fff;
+    font-size: 20px;
+    padding: 60px
+}
+
+nav li {
+    list-style-type: none;
+    margin-right: 20px
+}
+
+nav {
+    padding: 5px;
+    position: sticky;
+    top: 0
+}
+
+nav a {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 400;
+    text-decoration: none
+}
+
+#content {
+    float: left;
+    width: 75%
+}
+
+aside {
+    float: right;
+    padding-left: 20px;
+    width: 25%
+}
+
+@media screen and (max-width:1000px) {
+
+    #content,
+    aside {
+        padding: 0;
+        width: 100%
+    }
+}

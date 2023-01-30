@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header>
+        <title>Project 1</title>
+    </header>
+    <body style="user-select: none">
+        <h1>Curriculum Vitae Saya</h1>
+        <h2>Kenalan Sama Jonathan!</h2>
+        <table id="info">
+            <form action="/proses.php" method="post">
+                <tr>
+                    <td><label for="nama">Nama</label></td>
+                    <td>:</td>
+                    <td><input type="text" name="nama" value="Jonathan Immanuel"/></td>
+                </tr>
+                <tr>
+                    <td><label for="alamat">Alamat</label></td>
+                    <td>:</td>
+                    <td><textarea name="alamat" id="alamat">Jl. Dr. M Isa, Duku Palembang</textarea></td>
+                </tr>
+                <tr>
+                    <td><label for="gender">Gender</label></td>
+                    <td>:</td>
+                    <td><input type="radio" name="gender" value="pria" checked/>
+                    <span>Pria</span>
+                    <input type="radio" name="gender" value="wanita"/>
+                    <span>Wanita</span></td>
+                </tr>
+                <tr>
+                    <td><label for="jurusan">Jurusan</label></td>
+                    <td>:</td>
+                    <td>
+                        <select name="jurusan" id="jurusan">
+                            <option value="blank" selected>-</option>
+                            <option value="TI">Teknik Informatika</option>
+                            <option value="SK">Sistem Komputer</option>
+                            <option value="SI">Sistem Informasi</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="angkatan">Angkatan</label></td>
+                    <td>:</td>
+                    <td>
+                        <select name="angkatan" id="angkatan">
+                            <option value="blank" selected>-</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="jenjang">Jenjang</label></td>
+                    <td>:</td>
+                    <td>
+                        <input type="radio" name="jenjang" id="jenjang" value="S1" checked>
+                        <span>S1</span>
+                        <input type="radio" name="jenjang" id="jenjang" value="S2">
+                        <span>S2</span>
+                        <input type="radio" name="jenjang" id="jenjang" value="D3">
+                        <span>D3</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="prodi">Program Studi</label></td>
+                    <td>:</td>
+                    <td>
+                        <select name="prodi" id="prodi">
+                            <option value="blank" selected>-</option>
+                            <option value="tibil">Teknik Informatika Billingual</option>
+                            <option value="tireg">Teknik Informatika Reguler</option>
+                            <option value="sibil">Sistem Informasi Billingual</option>
+                            <option value="sireg">Sistem Informasi Reguler</option>
+                            <option value="sku">Sistem Komputer Unggulan</option>
+                            <option value="skreg">Sistem Komputer Reguler</option>
+                            <option value="mti">Magister Teknik Informatika</option>
+                            <option value="mi">Manajemen Informatika</option>
+                            <option value="ka">Komputerisasi Akuntansi</option>
+                            <option value="tk">Teknik Komputer</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td><input type="submit" value="Submit"></td>
+                </tr>
+            </form>
+        </table>
+    </body>
+</html>

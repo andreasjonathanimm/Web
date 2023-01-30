@@ -1,0 +1,83 @@
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+    }
+}
+
+body {
+    user-select: none;
+    outline: 3px dashed green;
+}
+
+.column {
+    float:left;
+    width: 50%;
+    font-family: monospace;
+    font-size:1vw;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.left {
+    width:40%;
+    color: antiquewhite;
+    background-color:dodgerblue;
+}
+
+.section-title {
+    margin-top: 10%;
+    margin-bottom:5%;
+}
+
+.qualifications-header {
+    font-size:2vw;
+    font-weight: bold;
+}
+
+.quality {
+    font-weight:bold;
+    font-size:1.75vw;
+}
+
+.stars {
+    font-weight:bold;
+    font-size:2vw;
+    color:orange;
+}
+
+.right {
+    width:59%;
+    margin-left:1%;
+}
+
+.column-header {
+    font-weight:bold;
+    font-size:3vw;
+    text-align:center;
+    text-decoration: underline;
+    font-family:"Segoe UI";
+    font-style:italic;
+}
+
+.name {
+    font-weight:bold;
+    font-size:3.25vw;
+}
+
+.description {
+    font-size:1.4vw;
+}
+
+.page-header {
+    margin-top:10%;
+    font-size:2.5vw;
+}
+
+.bold {
+    font-weight: bold;
+    font-size:1.5vw;
+}
