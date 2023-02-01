@@ -1,0 +1,7 @@
+PHP is typeless programming language which means the variables doesn't have to be declared a certain datatype.
+PHP is a loosely typed language. This means that you don't have to declare
+variables before using them, or declare their type.
+
+A variable's type is determined by the context in which the variable is used. For example, if
+you assign the value 5 to a variable, then later assign the value "five" to
+that variable, the variable will now be a string instead of an integer.
