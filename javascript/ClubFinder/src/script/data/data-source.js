@@ -1,6 +1,8 @@
-function DataSource(onSuccess, onFailed) {
-  this.onSuccess = onSuccess;
-  this.onFailed = onFailed;
+class DataSource{
+  constructor(onSuccess, onFailed) {
+    this.onSuccess = onSuccess;
+    this.onFailed = onFailed;
+  }
 }
 
 DataSource.prototype.searchClub = function (keyword) {
