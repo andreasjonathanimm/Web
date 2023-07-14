@@ -1,7 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 class AlbumsHandler {
-  constructor(service, validator) {
-    this._service = service;
+  constructor(albumsService, songsService, validator) {
+    this._albumsService = albumsService;
+    this._songsService = songsService;
     this._validator = validator;
 
     this.postAlbumsHandler = this.postAlbumsHandler.bind(this);
@@ -10,18 +11,14 @@ class AlbumsHandler {
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
   }
 
-  // Specifications:
-  // Body request: name: string, year: number
-  // Response:
-  //  status code: 201 (created),
-  //    body: { status: 'success', data: { albumId } }
   async postAlbumsHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
-    const { name, year } = request.payload;
-    const albumId = await this._service.addAlbum({ name, year });
+    const { name = 'untitled', year } = request.payload;
+    const albumId = await this._albumsService.addAlbum({ name, year });
 
     const response = h.response({
       status: 'success',
+      message: 'Album berhasil ditambahkan',
       data: {
         albumId,
       },
@@ -30,23 +27,17 @@ class AlbumsHandler {
     return response;
   }
 
-  // Specifications:
-  // Body request: none
-  // Response:
-  //  status code: 200 (OK),
-  //    body: { status: 'success', data: { album } }
   async getAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    const album = await this._service.getAlbumById(id);
-    const songs = await this._service.getSongs();
+    const album = await this._albumsService.getAlbumById(id);
+    const songs = await this._songsService.getSongs();
 
-    // check if songs is not undefined
-    if (songs !== undefined) {
-      // filter songs by albumId
-      album.songs = songs.filter((song) => song.albumId === id);
+    if (songs.length) {
+      album.songs = songs.filter((song) => song.album_id === id);
 
       const response = h.response({
         status: 'success',
+        message: 'Album berhasil ditemukan',
         data: {
           album: {
             id: album.id,
@@ -64,9 +55,9 @@ class AlbumsHandler {
       return response;
     }
 
-    // if songs is undefined
     const response = h.response({
       status: 'success',
+      message: 'Album berhasil ditemukan',
       data: {
         album: {
           id: album.id,
@@ -80,17 +71,12 @@ class AlbumsHandler {
     return response;
   }
 
-  // Specifications:
-  // Body request: name: string, year: number
-  // Response:
-  //  status code: 200 (OK),
-  //    body: { status: 'success', message: 'Album berhasil diperbarui' }
   async putAlbumByIdHandler(request, h) {
     this._validator.validateAlbumPayload(request.payload);
     const { id } = request.params;
     const { name, year } = request.payload;
 
-    await this._service.editAlbumById(id, { name, year });
+    await this._albumsService.editAlbumById(id, { name, year });
 
     const response = h.response({
       status: 'success',
@@ -100,14 +86,9 @@ class AlbumsHandler {
     return response;
   }
 
-  // Specifications:
-  // Body request: none
-  // Response:
-  //  status code: 200 (OK),
-  //    body: { status: 'success', message: 'Album berhasil dihapus' }
   async deleteAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    await this._service.deleteAlbumById(id);
+    await this._albumsService.deleteAlbumById(id);
     const response = h.response({
       status: 'success',
       message: 'Album berhasil dihapus',

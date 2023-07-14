@@ -13,7 +13,7 @@ const SongsValidator = {
     if (validationResult.error) {
       throw new InvariantError(validationResult.error.message);
     }
-  }
+  },
 };
 
 module.exports = SongsValidator;
