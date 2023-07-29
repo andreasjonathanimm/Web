@@ -1,7 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
+const path = require('path');
+const config = require('./utils/config');
 
 // albums
 const albums = require('./api/albums');
@@ -32,24 +36,38 @@ const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
 
+// playlists exports
+const playlistsExports = require('./api/exports/playlists');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
 // activities
 const ActivitiesService = require('./services/postgres/ActivitiesService');
 
 // error handling
 const ClientError = require('./exceptions/ClientError');
 
+// storage
+const StorageService = require('./services/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
+// cache
+const CacheService = require('./services/redis/CacheService');
+
 const init = async () => {
-  const albumsService = new AlbumsService();
+  const cacheService = new CacheService();
+  const albumsService = new AlbumsService(cacheService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
   const authenticationsService = new AuthenticationsService();
   const activitiesService = new ActivitiesService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/images'));
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: config.app.port,
+    host: config.app.host,
     routes: {
       cors: {
         origin: ['*'],
@@ -61,15 +79,18 @@ const init = async () => {
     {
       plugin: Jwt,
     },
+    {
+      plugin: Inert,
+    },
   ]);
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.jwt.accessTokenKey,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+      maxAgeSec: config.jwt.accessTokenAge,
     },
     validate: (artifacts) => ({
       isValid: true,
@@ -84,7 +105,9 @@ const init = async () => {
     options: {
       albumsService,
       songsService,
-      validator: AlbumsValidator,
+      storageService,
+      albumsValidator: AlbumsValidator,
+      uploadsValidator: UploadsValidator,
     },
   },
   {
@@ -121,6 +144,14 @@ const init = async () => {
       validator: PlaylistsValidator,
     },
   },
+  {
+    plugin: playlistsExports,
+    options: {
+      producerService: ProducerService,
+      playlistsService,
+      validator: ExportsValidator,
+    },
+  },
   ]);
 
   server.ext('onPreResponse', (request, h) => {
@@ -151,6 +182,16 @@ const init = async () => {
     }
     // jika bukan error lanjutkan dengan response sebelumnya (tanpa terintervensi)
     return h.continue;
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/uploads/images/{param*}',
+    handler: {
+      directory: {
+        path: path.resolve(__dirname, 'api/uploads/images'),
+      },
+    },
   });
 
   await server.start();
