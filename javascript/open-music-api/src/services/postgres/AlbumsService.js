@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
@@ -7,8 +6,8 @@ const { mapDBToModel } = require('../../utils/albums');
 
 class AlbumsService {
   constructor(cacheService) {
-    this._pool = new Pool();
-    this._cacheService = cacheService;
+    this.pool = new Pool();
+    this.cacheService = cacheService;
   }
 
   async addAlbum({ name, year }) {
@@ -19,7 +18,7 @@ class AlbumsService {
       values: [id, name, year],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new InvariantError('Album gagal ditambahkan');
@@ -33,7 +32,7 @@ class AlbumsService {
       text: 'SELECT * FROM albums WHERE id = $1',
       values: [id],
     };
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('Album tidak ditemukan');
@@ -48,7 +47,7 @@ class AlbumsService {
       values: [name, year, id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
@@ -61,7 +60,7 @@ class AlbumsService {
       values: [coverUrl, id],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui cover album. Id tidak ditemukan');
@@ -73,7 +72,7 @@ class AlbumsService {
       text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
       values: [id],
     };
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
@@ -86,7 +85,7 @@ class AlbumsService {
       values: [userId, albumId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     return result.rowCount;
   }
@@ -99,13 +98,13 @@ class AlbumsService {
       values: [id, userId, albumId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new InvariantError('Like gagal ditambahkan');
     }
 
-    this._cacheService.delete(`like:album:${albumId}`);
+    this.cacheService.delete(`like:album:${albumId}`);
   }
 
   async deleteLikeAlbumById(albumId, userId) {
@@ -114,18 +113,18 @@ class AlbumsService {
       values: [userId, albumId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new InvariantError('Like gagal dihapus');
     }
 
-    this._cacheService.delete(`like:album:${albumId}`);
+    this.cacheService.delete(`like:album:${albumId}`);
   }
 
   async getLikeAlbumById(albumId) {
     try {
-      const result = await this._cacheService.get(`like:album:${albumId}`);
+      const result = await this.cacheService.get(`like:album:${albumId}`);
       return {
         likesCount: JSON.parse(result),
         cached: true,
@@ -136,10 +135,10 @@ class AlbumsService {
         values: [albumId],
       };
 
-      const result = await this._pool.query(query);
+      const result = await this.pool.query(query);
 
       // save cache for 30 minutes
-      await this._cacheService.set(`like:album:${albumId}`, JSON.stringify(result.rows[0].count), 1800);
+      await this.cacheService.set(`like:album:${albumId}`, JSON.stringify(result.rows[0].count), 1800);
 
       return {
         likesCount: result.rows[0].count,

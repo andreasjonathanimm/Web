@@ -1,28 +1,21 @@
-/* eslint-disable no-underscore-dangle */
+const autoBind = require('auto-bind');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class AlbumsHandler {
   constructor(albumsService, songsService, storageService, albumsValidator, uploadsValidator) {
-    this._albumsService = albumsService;
-    this._songsService = songsService;
-    this._storageService = storageService;
-    this._albumsValidator = albumsValidator;
-    this._uploadsValidator = uploadsValidator;
+    this.albumsService = albumsService;
+    this.songsService = songsService;
+    this.storageService = storageService;
+    this.albumsValidator = albumsValidator;
+    this.uploadsValidator = uploadsValidator;
 
-    this.postAlbumsHandler = this.postAlbumsHandler.bind(this);
-    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
-    this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
-    this.postAlbumsCoverHandler = this.postAlbumsCoverHandler.bind(this);
-    this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
-    this.postLikeAlbumByIdHandler = this.postLikeAlbumByIdHandler.bind(this);
-    this.deleteLikeAlbumByIdHandler = this.deleteLikeAlbumByIdHandler.bind(this);
-    this.getLikeAlbumByIdHandler = this.getLikeAlbumByIdHandler.bind(this);
+    autoBind(this);
   }
 
   async postAlbumsHandler(request, h) {
-    this._albumsValidator.validateAlbumPayload(request.payload);
+    this.albumsValidator.validateAlbumPayload(request.payload);
     const { name = 'untitled', year } = request.payload;
-    const albumId = await this._albumsService.addAlbum({ name, year });
+    const albumId = await this.albumsService.addAlbum({ name, year });
 
     const response = h.response({
       status: 'success',
@@ -37,15 +30,15 @@ class AlbumsHandler {
 
   async getAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    const album = await this._albumsService.getAlbumById(id);
-    const songs = await this._songsService.getSongs();
+    const album = await this.albumsService.getAlbumById(id);
+    const songs = await this.songsService.getSongs();
 
     if (album.coverUrl === undefined) {
       album.coverUrl = null;
     }
 
     if (songs.length) {
-      album.songs = songs.filter((song) => song.album_id === id);
+      album.songs = songs.filter((song) => song.albumid === id);
 
       const response = h.response({
         status: 'success',
@@ -86,11 +79,11 @@ class AlbumsHandler {
   }
 
   async putAlbumByIdHandler(request, h) {
-    this._albumsValidator.validateAlbumPayload(request.payload);
+    this.albumsValidator.validateAlbumPayload(request.payload);
     const { id } = request.params;
     const { name, year } = request.payload;
 
-    await this._albumsService.editAlbumById(id, { name, year });
+    await this.albumsService.editAlbumById(id, { name, year });
 
     const response = h.response({
       status: 'success',
@@ -103,11 +96,11 @@ class AlbumsHandler {
   async postAlbumsCoverHandler(request, h) {
     const { id } = request.params;
     const { cover } = request.payload;
-    this._uploadsValidator.validateImageHeaders(cover.hapi.headers);
+    this.uploadsValidator.validateImageHeaders(cover.hapi.headers);
 
-    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const filename = await this.storageService.writeFile(cover, cover.hapi);
 
-    await this._albumsService.addAlbumCoverById(id, `http://${process.env.HOST}:${process.env.PORT}/uploads/images/${filename}`);
+    await this.albumsService.addAlbumCoverById(id, `http://${process.env.HOST}:${process.env.PORT}/uploads/images/${filename}`);
 
     const response = h.response({
       status: 'success',
@@ -119,7 +112,7 @@ class AlbumsHandler {
 
   async deleteAlbumByIdHandler(request, h) {
     const { id } = request.params;
-    await this._albumsService.deleteAlbumById(id);
+    await this.albumsService.deleteAlbumById(id);
     const response = h.response({
       status: 'success',
       message: 'Album berhasil dihapus',
@@ -133,14 +126,14 @@ class AlbumsHandler {
     const { id: credentialId } = request.auth.credentials;
 
     // test if album exists
-    await this._albumsService.getAlbumById(id);
+    await this.albumsService.getAlbumById(id);
 
-    const hasLiked = await this._albumsService.verifyLikeAlbumById(id, credentialId);
+    const hasLiked = await this.albumsService.verifyLikeAlbumById(id, credentialId);
     if (hasLiked) {
       throw new InvariantError('Like gagal ditambahkan, Anda sudah memberikan like sebelumnya');
     }
 
-    await this._albumsService.addLikeAlbumById(id, credentialId);
+    await this.albumsService.addLikeAlbumById(id, credentialId);
 
     const response = h.response({
       status: 'success',
@@ -155,14 +148,14 @@ class AlbumsHandler {
     const { id: credentialId } = request.auth.credentials;
 
     // test if album exists
-    await this._albumsService.getAlbumById(id);
+    await this.albumsService.getAlbumById(id);
 
-    const hasLiked = await this._albumsService.verifyLikeAlbumById(id, credentialId);
+    const hasLiked = await this.albumsService.verifyLikeAlbumById(id, credentialId);
     if (!hasLiked) {
       throw new InvariantError('Like gagal dihapus, Anda belum memberikan like sebelumnya');
     }
 
-    await this._albumsService.deleteLikeAlbumById(id, credentialId);
+    await this.albumsService.deleteLikeAlbumById(id, credentialId);
 
     const response = h.response({
       status: 'success',
@@ -176,9 +169,9 @@ class AlbumsHandler {
     const { id } = request.params;
 
     // test if album exists
-    await this._albumsService.getAlbumById(id);
+    await this.albumsService.getAlbumById(id);
 
-    const { likesCount, cached } = await this._albumsService.getLikeAlbumById(id);
+    const { likesCount, cached } = await this.albumsService.getLikeAlbumById(id);
 
     const response = h.response({
       status: 'success',

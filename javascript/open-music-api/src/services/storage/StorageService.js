@@ -1,9 +1,8 @@
-/* eslint-disable no-underscore-dangle */
 const fs = require('fs');
 
 class StorageService {
   constructor(folder) {
-    this._folder = folder;
+    this.folder = folder;
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
@@ -12,7 +11,7 @@ class StorageService {
 
   writeFile(file, meta) {
     const filename = +new Date() + meta.filename;
-    const path = `${this._folder}/${filename}`;
+    const path = `${this.folder}/${filename}`;
 
     const fileStream = fs.createWriteStream(path);
 

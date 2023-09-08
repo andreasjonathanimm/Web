@@ -1,26 +1,16 @@
-/* eslint-disable no-underscore-dangle */
+const autoBind = require('auto-bind');
+
 class SongsHandler {
   constructor(service, validator) {
-    this._service = service;
-    this._validator = validator;
+    this.service = service;
+    this.validator = validator;
 
-    this.postSongHandler = this.postSongHandler.bind(this);
-    this.getSongsHandler = this.getSongsHandler.bind(this);
-    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
-    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
-    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
+    autoBind(this);
   }
 
   async postSongHandler(request, h) {
-    this._validator.validateSongPayload(request.payload);
-    const {
-      title, year, performer, genre, duration, albumId,
-    } = request.payload;
-    const songId = await this._service.addSong(
-      {
-        title, year, performer, genre, duration, albumId,
-      },
-    );
+    this.validator.validateSongPayload(request.payload);
+    const songId = await this.service.addSong(request.payload);
 
     const response = h.response({
       status: 'success',
@@ -33,35 +23,29 @@ class SongsHandler {
     return response;
   }
 
-  async getSongsHandler(request) {
-    this._validator.validateFilterSongPayload(request.query);
-    const songs = await this._service.getSongs();
+  async getSongsHandler(request, h) {
+    this.validator.validateFilterSongPayload(request.query);
     const { title, performer } = request.query;
+    const { songs, cached } = await this.service.getSongs(title, performer);
 
-    const filteredSongs = songs.filter((song) => {
-      const isTitleMatch = title === undefined || song.title.toLowerCase()
-        .includes(title.toLowerCase());
-      const isPerformerMatch = performer === undefined || song.performer.toLowerCase()
-        .includes(performer.toLowerCase());
-      return isTitleMatch && isPerformerMatch;
-    });
-
-    return {
+    const response = h.response({
       status: 'success',
-      message: 'Lagu berhasil ditemukan',
       data: {
-        songs: filteredSongs.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
+        songs,
       },
-    };
+    });
+    response.code(200);
+    if (cached) {
+      response.header('X-Data-Source', 'cache');
+    } else {
+      response.header('X-Data-Source', 'database');
+    }
+    return response;
   }
 
   async getSongByIdHandler(request, h) {
     const { id } = request.params;
-    const song = await this._service.getSongById(id);
+    const { song, cached } = await this.service.getSongById(id);
     const response = h.response({
       status: 'success',
       message: 'Lagu berhasil ditemukan',
@@ -69,18 +53,23 @@ class SongsHandler {
         song,
       },
     });
+    if (cached) {
+      response.header('X-Data-Source', 'cache');
+    } else {
+      response.header('X-Data-Source', 'database');
+    }
     response.code(200);
     return response;
   }
 
   async putSongByIdHandler(request, h) {
-    this._validator.validateSongPayload(request.payload);
+    this.validator.validateSongPayload(request.payload);
     const { id } = request.params;
     const {
       title, year, performer, genre, duration, albumId,
     } = request.payload;
 
-    await this._service.editSongById(id, {
+    await this.service.editSongById(id, {
       title, year, performer, genre, duration, albumId,
     });
 
@@ -94,7 +83,7 @@ class SongsHandler {
 
   async deleteSongByIdHandler(request, h) {
     const { id } = request.params;
-    await this._service.deleteSongById(id);
+    await this.service.deleteSongById(id);
     const response = h.response({
       status: 'success',
       message: 'Lagu berhasil dihapus',

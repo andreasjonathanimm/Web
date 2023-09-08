@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
@@ -25,6 +24,7 @@ const AuthenticationsValidator = require('./validator/authentications');
 
 // users
 const UsersService = require('./services/postgres/UsersService');
+const UsersValidator = require('./validator/users');
 
 // collaborations
 const collaborations = require('./api/collaborations');
@@ -57,10 +57,10 @@ const CacheService = require('./services/redis/CacheService');
 const init = async () => {
   const cacheService = new CacheService();
   const albumsService = new AlbumsService(cacheService);
-  const songsService = new SongsService();
+  const songsService = new SongsService(cacheService);
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService();
-  const playlistsService = new PlaylistsService(collaborationsService);
+  const playlistsService = new PlaylistsService(collaborationsService, cacheService);
   const authenticationsService = new AuthenticationsService();
   const activitiesService = new ActivitiesService();
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/images'));
@@ -123,7 +123,8 @@ const init = async () => {
       authenticationsService,
       usersService,
       tokenManager: TokenManager,
-      validator: AuthenticationsValidator,
+      authenticationsValidator: AuthenticationsValidator,
+      usersValidator: UsersValidator,
     },
   },
   {

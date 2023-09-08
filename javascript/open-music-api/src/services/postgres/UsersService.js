@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-underscore-dangle */
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
@@ -9,7 +7,7 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 
 class UsersService {
   constructor() {
-    this._pool = new Pool();
+    this.pool = new Pool();
   }
 
   async addUser({ username, password, fullname }) {
@@ -20,7 +18,7 @@ class UsersService {
       text: 'INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id',
       values: [id, username, hashedPassword, fullname],
     };
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
     if (!result.rowCount) {
       throw new InvariantError('User gagal ditambahkan');
     }
@@ -32,7 +30,7 @@ class UsersService {
       text: 'SELECT username FROM users WHERE username = $1',
       values: [username],
     };
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
     if (result.rows.length > 0) {
       throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
     }
@@ -44,7 +42,7 @@ class UsersService {
       values: [userId],
     };
 
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
 
     if (!result.rowCount) {
       throw new NotFoundError('User tidak ditemukan');
@@ -56,7 +54,7 @@ class UsersService {
       text: 'SELECT id, password FROM users WHERE username = $1',
       values: [username],
     };
-    const result = await this._pool.query(query);
+    const result = await this.pool.query(query);
     if (!result.rowCount) {
       throw new AuthenticationError('Kredensial yang Anda berikan salah');
     }

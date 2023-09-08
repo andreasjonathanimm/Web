@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 require('dotenv').config();
 const amqp = require('amqplib');
 const PlaylistsService = require('./PlaylistsService');

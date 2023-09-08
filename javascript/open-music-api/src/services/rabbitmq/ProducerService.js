@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const amqp = require('amqplib');
 const config = require('../../utils/config');
 
